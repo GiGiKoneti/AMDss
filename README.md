@@ -92,7 +92,7 @@ python -m linguist_core.api_server
 ```
 
 ### Step 2: Launch the UI 
-In a new terminal window:
+In a new terminal window(for system A):
 ```bash
 cd AMDss
 source cleanenv/bin/activate
