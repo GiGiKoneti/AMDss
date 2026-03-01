@@ -1,3 +1,9 @@
+"""
+Linguist-Core: High-Fidelity GraphRAG Engine
+============================================
+Implements a multi-hop retrieval architecture that bridges graph topology with 
+generative LLMs for sovereign, edge-local reasoning.
+"""
 import logging
 from typing import List, Dict, Any
 import numpy as np
@@ -6,6 +12,14 @@ from .graph_store import LocalGraphStore
 logger = logging.getLogger(__name__)
 
 class GraphRAG:
+    """
+    Orchestrates the Graph-Augmented Generation pipeline.
+    
+    Components:
+    - Knowledge Retrieval: BFS-inspired neighborhood context extraction.
+    - Semantic Grounding: Graph-node mapping.
+    - Edge Inference: Local flan-t5 execution.
+    """
     def __init__(self, graph_store: LocalGraphStore):
         self.graph_store = graph_store
         # Load local tiny LLM for inference simulation

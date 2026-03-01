@@ -1,3 +1,10 @@
+"""
+Linguist-Core: Semantic Extraction Engine
+=========================================
+This module implements a hybrid extraction strategy for deriving semantic relationships 
+from unstructured technical documentation. It utilizes a precision-weighted 
+Semantic Fallback Engine to identify Subject-Predicate-Object triples with high recall.
+"""
 import logging
 import re
 from typing import List, Optional, Any
@@ -9,13 +16,28 @@ except (ImportError, ValueError):
 logger = logging.getLogger(__name__)
 
 class KnowledgeExtractor:
+    """
+    Core engine for transforming raw text into structured semantic knowledge.
+    
+    Strategies:
+    1. Dynamic Fallback: Heuristic extraction for rapid processing.
+    2. Semantic Fallback Engine: High-recall verb-based triple identification.
+    3. LLM/NLP (Bridge ready): Structural parsing hooks for future scaling.
+    """
     def __init__(self, use_mock: bool = True):
         self.use_mock = use_mock
         # Placeholder for vLLM / LangChain setup
     
     def extract_triplets(self, text: str, source_ref: Optional[str] = None) -> List[KnowledgeTriplet]:
         """
-        Extracts entities and relationships from text.
+        Parses input text to identify and extract semantic relationships.
+        
+        Args:
+            text: Raw documentation string.
+            source_ref: Identifier for the source document (e.g., filename).
+            
+        Returns:
+            List of KnowledgeTriplet objects representing the semantic graph nodes/edges.
         """
         if self.use_mock:
             # Fallback mock logic...
