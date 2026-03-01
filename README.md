@@ -31,27 +31,44 @@ Linguist-Core is a high-performance, edge-first Knowledge Graph and RAG (Retriev
 
 ### Prerequisites
 - Python 3.9+
-- `pip` and `venv`
+- `pip` and `cleanenv`
 
 ### 1. Clone & Setup
 ```bash
 git clone https://github.com/GiGiKoneti/AMDss.git
 cd AMDss
-python3 -m venv venv
+python3 -m venv cleanenv --upgrade-deps
 ```
 
 ### 2. Install Dependencies
-**Windows (PowerShell):**
+
+**Create a virutal environment**
+
+Windows (PowerShell):
 ```powershell
-.\venv\Scripts\activate
+.\cleanenv\Scripts\activate
+```
+
+macOS / Linux (Terminal):
+```bash
+source cleanenv/bin/activate
+```
+
+**Verify that Python and pip are coming from the virtual environment:**
+```bash
+which python
+which pip
+```
+**Both paths should point to:**
+```bash
+.../AMDss/cleanenv/bin/
+```
+
+**Install Required Dependencies:**
+```bash
 pip install -r requirements.txt
 ```
 
-**macOS / Linux (Terminal):**
-```bash
-source venv/bin/activate
-pip install -r requirements.txt
-```
 
 ---
 
@@ -75,8 +92,11 @@ python -m linguist_core.api_server
 ```
 
 ### Step 2: Launch the UI 
-In a new terminal window (with venv active):
+In a new terminal window(for system A):
 ```bash
+cd AMDss
+source cleanenv/bin/activate
+export PEER_IPS="192.168.0.112"
 python -m linguist_core.ui_app
 ```
 Access the UI at: `http://localhost:7860`
