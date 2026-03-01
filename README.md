@@ -22,52 +22,52 @@ It extracts semantic triples from unstructured documentation in real-time, build
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                    INGESTION & EXTRACTION                        │
+│                    INGESTION & EXTRACTION                       │
 ├─────────────────────────────────────────────────────────────────┤
-│                                                                   │
-│  Research Document → TS-Native Parser → Hybrid Extraction      │
+│                                                                 │
+│  Research Document → TS-Native Parser → Hybrid Extraction       │
 │                                         Engine → Semantic       │
-│                                                  Triples         │
-│                                                                   │
+│                                                  Triples        │
+│                                                                 │
 └─────────────────────────────────────────────────────────────────┘
                               ↓
 ┌─────────────────────────────────────────────────────────────────┐
-│                      KNOWLEDGE FABRIC                            │
+│                      KNOWLEDGE FABRIC                           │
 ├─────────────────────────────────────────────────────────────────┤
-│                                                                   │
+│                                                                 │
 │  NetworkX MultiDiGraph ← Semantic Triples                       │
-│           ↓                                                       │
-│  BGE-M3 Embeddings (High-Fidelity Vector Encoding)             │
-│           ↓                                                       │
-│  ZMQ Sync Layer (Zero-Trust P2P Synchronization)               │
-│                                                                   │
+│           ↓                                                     │
+│  BGE-M3 Embeddings (High-Fidelity Vector Encoding)              │
+│           ↓                                                     │
+│  ZMQ Sync Layer (Zero-Trust P2P Synchronization)                │
+│                                                                 │
 └─────────────────────────────────────────────────────────────────┘
                               ↓
 ┌─────────────────────────────────────────────────────────────────┐
-│                  DISTRIBUTED NETWORK                             │
+│                  DISTRIBUTED NETWORK                            │
 ├─────────────────────────────────────────────────────────────────┤
-│                                                                   │
-│   Node A (Ryzen AI) ←ZMQ→ Node B (Radeon Pro) ←ZMQ→            │
-│                                                                   │
-│                     Node C (Instinct MI)                         │
-│                                                                   │
+│                                                                 │
+│   Node A (Ryzen AI) ←ZMQ→ Node B (Radeon Pro) ←ZMQ→             │
+│                                                                 │
+│                     Node C (Instinct MI)                        │
+│                                                                 │
 │   All nodes maintain synchronized global state                  │
 │   Raw source files never shared across network                  │
-│                                                                   │
+│                                                                 │
 └─────────────────────────────────────────────────────────────────┘
                               ↓
 ┌─────────────────────────────────────────────────────────────────┐
-│                      INFERENCE PATH                              │
+│                      INFERENCE PATH                             │
 ├─────────────────────────────────────────────────────────────────┤
-│                                                                   │
+│                                                                 │
 │  User Query → GraphRAG BFS Traversal                            │
-│                     ↓                                            │
-│          Neighborhood Context Extraction                         │
-│                     ↓                                            │
-│       Quantized flan-t5 (AMD ROCm Optimized)                   │
-│                     ↓                                            │
-│           Sovereign, Local Answer Generation                     │
-│                                                                   │
+│                     ↓                                           │
+│          Neighborhood Context Extraction                        │
+│                     ↓                                           │
+│       Quantized flan-t5 (AMD ROCm Optimized)                    │
+│                     ↓                                           │
+│           Sovereign, Local Answer Generation                    │
+│                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
