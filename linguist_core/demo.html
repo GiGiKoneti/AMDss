@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linguist-Core | Sovereign Distributed Knowledge Graph</title>
+    <!-- Include Vis.js for graph visualization -->
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --amd-red: #ED0000;
+            --bg-dark: #0A0A0B;
+            --bg-panel: #18181A;
+            --text-main: #FFFFFF;
+            --text-muted: #888888;
+            --border: #333333;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        header {
+            padding: 20px 40px;
+            background: var(--bg-panel);
+            border-bottom: 2px solid var(--amd-red);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 24px;
+            letter-spacing: 1px;
+        }
+
+        .logo span {
+            color: var(--amd-red);
+        }
+
+        .hardware-badge {
+            background: rgba(237, 0, 0, 0.1);
+            color: var(--amd-red);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid var(--amd-red);
+        }
+
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 350px;
+            background: var(--bg-panel);
+            border-right: 1px solid var(--border);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+        }
+
+        .panel {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        h3 {
+            margin-top: 0;
+            font-size: 14px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .button {
+            background: var(--amd-red);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.2s;
+        }
+
+        .button:hover {
+            background: #ff1a1a;
+            transform: translateY(-1px);
+        }
+
+        .button.secondary {
+            background: transparent;
+            border: 1px solid var(--border);
+            margin-top: 10px;
+        }
+
+        .button.secondary:hover {
+            border-color: var(--text-muted);
+        }
+
+        .log-c {
+            font-family: monospace;
+            font-size: 12px;
+            color: #00ff00;
+            background: #000;
+            padding: 10px;
+            border-radius: 5px;
+            height: 150px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            margin-bottom: 4px;
+        }
+
+        .graph-container {
+            flex: 1;
+            position: relative;
+        }
+
+        #network {
+            width: 100%;
+            height: 100%;
+        }
+
+        .floating-query {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(24, 24, 26, 0.95);
+            border: 1px solid var(--border);
+            padding: 20px;
+            border-radius: 12px;
+            width: 600px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            color: white;
+            border-radius: 6px;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--amd-red);
+        }
+
+        #answer-box {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(237, 0, 0, 0.05);
+            border-left: 3px solid var(--amd-red);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .pulse {
+            animation: pulse-animation 2s infinite;
+        }
+
+        @keyframes pulse-animation {
+            0% { box-shadow: 0 0 0 0 rgba(237, 0, 0, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(237, 0, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(237, 0, 0, 0); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">LINGUIST<span>CORE</span></div>
+        <div style="display: flex; gap: 10px;">
+            <div class="hardware-badge">ROCm vLLM 7.0</div>
+            <div class="hardware-badge">Ryzen AI NPU</div>
+            <div class="hardware-badge">RCCL Sync</div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- Sidebar Controls -->
+        <div class="sidebar">
+            <div class="panel">
+                <h3>1. Ingest Knowledge</h3>
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">
+                    Upload a local document. The AMD GPU will extract relationships and broadcast them peer-to-peer immediately.
+                </p>
+                <div style="border: 1px dashed var(--border); padding: 20px; text-align: center; border-radius: 5px; margin-bottom: 15px; color: var(--text-muted); cursor: pointer;" onclick="simulateUpload()">
+                    📄 Click to upload physics_paper.pdf
+                </div>
+                <button class="button pulse" id="sync-btn" onclick="simulateSync()" disabled>Initialize P2P Sync (RCCL)</button>
+            </div>
+
+            <div class="panel">
+                <h3>2. Node Connect (Simulated)</h3>
+                <button class="button secondary" onclick="simulatePeerJoin()">Simulate Peer Node Joining LAN</button>
+            </div>
+
+            <div class="panel" style="flex: 1;">
+                <h3>System Console</h3>
+                <div class="log-c" id="console">
+                    <div class="log-entry">[SYSTEM] Initializing AMD Infinity Fabric hooks... OK</div>
+                    <div class="log-entry">[SYSTEM] Local node ID: 8f4b2a9c</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Graph Area -->
+        <div class="graph-container">
+            <div id="network"></div>
+
+            <div class="floating-query">
+                <input type="text" id="query-input" placeholder="GraphRAG Query (e.g., 'How does Schrödinger relate to Entanglement?')">
+                <div style="display: flex; gap: 10px;">
+                    <button class="button" style="flex: 1;" onclick="executeGraphRAG()">Ask Distributed Graph</button>
+                    <button class="button secondary" style="flex: 1; margin-top: 0; display: flex; align-items: center; justify-content: center; gap: 5px;" onclick="simulateVoiceQuery()">
+                        🎙️ NPU Whisper Query
+                    </button>
+                </div>
+                <div id="answer-box"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function log(msg) {
+            const consoleEl = document.getElementById('console');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.textContent = `[${new Date().toLocaleTimeString().split(' ')[0]}] ${msg}`;
+            consoleEl.appendChild(entry);
+            consoleEl.scrollTop = consoleEl.scrollHeight;
+        }
+
+        // Vis.js Graph Setup
+        const nodes = new vis.DataSet([
+            { id: 1, label: 'Quantum Entanglement', color: '#ED0000', font: { color: 'white' } },
+            { id: 2, label: 'Superposition', color: '#ED0000', font: { color: 'white' } }
+        ]);
+
+        const edges = new vis.DataSet([
+            { from: 1, to: 2, label: 'requires', color: '#555', font: { color: '#888', align: 'middle' }, arrows: 'to' }
+        ]);
+
+        const container = document.getElementById('network');
+        const data = { nodes: nodes, edges: edges };
+        const options = {
+            nodes: {
+                shape: 'dot',
+                size: 20,
+                borderWidth: 2,
+                color: { border: '#fff' }
+            },
+            physics: {
+                barnesHut: { gravitationalConstant: -2000, centralGravity: 0.3, springLength: 150 }
+            }
+        };
+
+        const network = new vis.Network(container, data, options);
+
+        // Simulation Logic
+        function simulateUpload() {
+            log("Ingesting physics_paper.pdf...");
+            setTimeout(() => {
+                log("vLLM (Llama 3.1 8B INT4) extracting triplets...");
+                document.getElementById('sync-btn').disabled = false;
+                document.getElementById('sync-btn').classList.add('pulse');
+                
+                nodes.add([
+                    { id: 3, label: 'Schrödinger', color: '#ED0000', font: { color: 'white' } },
+                    { id: 4, label: 'Wave Equation', color: '#ED0000', font: { color: 'white' } }
+                ]);
+                edges.add([
+                    { from: 3, to: 4, label: 'developed', color: '#555', arrows: 'to' },
+                    { from: 4, to: 1, label: 'describes', color: '#555', arrows: 'to' }
+                ]);
+            }, 800);
+        }
+
+        function simulateSync() {
+            log("Broadcasting embeddings via RCCL...");
+            setTimeout(() => {
+                log("Broadcast complete. 4 nodes updated in 43ms.");
+                document.getElementById('sync-btn').classList.remove('pulse');
+                document.getElementById('sync-btn').disabled = true;
+            }, 600);
+        }
+
+        let peerCount = 0;
+        function simulatePeerJoin() {
+            peerCount++;
+            const peerId = Math.random().toString(36).substring(2, 8);
+            log(`Peer joined: ${peerId}. Receiving external knowledge...`);
+            
+            setTimeout(() => {
+                const startId = 10 + (peerCount * 5);
+                nodes.add([
+                    { id: startId, label: 'Quantum Tunneling', color: '#4a90e2', font: { color: 'white' } }, // External nodes diff color
+                    { id: startId+1, label: 'Alpha Decay', color: '#4a90e2', font: { color: 'white' } }
+                ]);
+                edges.add([
+                    { from: startId, to: startId+1, label: 'enables', color: '#555', arrows: 'to' },
+                    { from: 4, to: startId, label: 'governs', color: '#555', arrows: 'to' }
+                ]);
+                log(`Graph updated with Peer ${peerId}'s knowledge.`);
+            }, 1000);
+        }
+
+        function executeGraphRAG(overrideInput = null) {
+            const inputEl = document.getElementById('query-input');
+            const query = overrideInput || inputEl.value;
+            if (!query) return;
+            
+            inputEl.value = query; // Update input field if overridden
+            
+            const ansBox = document.getElementById('answer-box');
+            ansBox.style.display = 'block';
+            ansBox.innerHTML = '<span style="color:var(--amd-red)">Running MIGraphX path traversal...</span>';
+            
+            setTimeout(() => {
+                ansBox.innerHTML = `
+                    <strong>GraphRAG Context Found:</strong><br>
+                    - Schrödinger <em>> developed ></em> Wave Equation<br>
+                    - Wave Equation <em>> describes ></em> Quantum Entanglement<br>
+                    - Wave Equation <em>> governs ></em> Quantum Tunneling (Source: Peer Node)<br><br>
+                    <strong>vLLM Generation:</strong><br>
+                    Based on the localized graph traversal across peer knowledge, Schrödinger's Wave Equation serves as the foundational mathematical model that describes the probabilities inherent in Quantum Entanglement. Furthermore, data from a peer node indicates that the same equation governs Quantum Tunneling, which enables Alpha Decay.
+                `;
+            }, 1500);
+        }
+        
+        function simulateVoiceQuery() {
+            const ansBox = document.getElementById('answer-box');
+            ansBox.style.display = 'block';
+            ansBox.innerHTML = '<span style="color:var(--amd-red)">NPU Whisper transcribing audio...</span>';
+            
+            setTimeout(() => {
+                executeGraphRAG("Can you explain the connection between Schrödinger and Alpha Decay?");
+            }, 1200);
+        }
+    </script>
+</body>
+</html>

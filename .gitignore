@@ -1,0 +1,7 @@
+python/
+python_embed.zip
+*.pkl
+__pycache__/
+*.whl
+*.zip
+docx_temp/
