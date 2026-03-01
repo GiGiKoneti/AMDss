@@ -24,10 +24,6 @@ click==8.3.1
 cloudpickle==3.1.2
 colorama
 colorlog==6.10.1
-conda
-conda-libmamba-solver
-conda-package-handling
-conda_package_streaming
 contourpy==1.3.3
 coverage==7.13.4
 cryptography==46.0.5
