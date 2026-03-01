@@ -9,11 +9,21 @@ from .models import KnowledgeTriplet
 logger = logging.getLogger(__name__)
 
 class LocalGraphStore:
-    def __init__(self, db_path: str = "local_graph.pkl"):
+    def __init__(self, db_path: str = "local_graph.pkl", load_model: bool = False):
         self.db_path = db_path
         self.graph = nx.MultiDiGraph()
+        self._embedding_cache = {}
+        self.embedder = None
         
+        if load_model:
+            self._init_embedder()
+            
+        self.load()
+
+    def _init_embedder(self):
         # Initialize embedding model (using small CPU model instead of BGE-M3 for dev env)
+        if self.embedder is not None:
+            return
         try:
             from transformers import pipeline
             logger.info("Loading embedding model (all-MiniLM-L6-v2)...")
@@ -21,20 +31,33 @@ class LocalGraphStore:
         except Exception as e:
             logger.error(f"Failed to load embedder: {e}")
             self.embedder = None
-            
-        self.load()
 
     def get_embedding(self, text: str) -> np.ndarray:
+        if text in self._embedding_cache:
+            return self._embedding_cache[text]
+
+        if self.embedder is None:
+            self._init_embedder()
+
         if self.embedder:
             # feature-extraction returns list of lists (batch, sequence, hidden_size)
             # We mean-pool over the sequence to get a single vector
-            out = self.embedder(text)
-            vec = np.mean(out[0], axis=0)
-            return np.array(vec, dtype=np.float32)
+            try:
+                out = self.embedder(text)
+                vec = np.mean(out[0], axis=0)
+                emb = np.array(vec, dtype=np.float32)
+                self._embedding_cache[text] = emb
+                return emb
+            except Exception as e:
+                logger.error(f"Embedding error: {e}")
+                return self._fallback_vector(text)
         else:
-            # Fallback random deterministic vector if ML fails
-            np.random.seed(abs(hash(text)) % (2**32))
-            return np.random.randn(384).astype(np.float32)
+            return self._fallback_vector(text)
+
+    def _fallback_vector(self, text: str) -> np.ndarray:
+        # Fallback random deterministic vector if ML fails
+        np.random.seed(abs(hash(text)) % (2**32))
+        return np.random.randn(384).astype(np.float32)
 
     def add_triplets(self, triplets: List[KnowledgeTriplet]):
         """Adds multiple knowledge triplets to the graph, attaching embeddings to nodes."""

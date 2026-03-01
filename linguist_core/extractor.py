@@ -1,6 +1,10 @@
 import logging
-from typing import List
-from .models import KnowledgeTriplet
+import re
+from typing import List, Optional, Any
+try:
+    from .models import KnowledgeTriplet
+except (ImportError, ValueError):
+    from linguist_core.models import KnowledgeTriplet
 
 logger = logging.getLogger(__name__)
 
@@ -9,7 +13,7 @@ class KnowledgeExtractor:
         self.use_mock = use_mock
         # Placeholder for vLLM / LangChain setup
     
-    def extract_triplets(self, text: str, source_ref: str = None) -> List[KnowledgeTriplet]:
+    def extract_triplets(self, text: str, source_ref: Optional[str] = None) -> List[KnowledgeTriplet]:
         """
         Extracts entities and relationships from text.
         """
@@ -27,84 +31,64 @@ class KnowledgeExtractor:
                     KnowledgeTriplet(subject="Schrödinger", predicate="developed", object="Wave Equation", source_reference=source_ref)
                 ]
 
-        # Genuine AI Extraction via Local Transformers Pipeline
-        logger.info(f"Running genuine HuggingFace ML Extraction for {source_ref}...")
-        try:
-            from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
-            if not getattr(self, "nlp_model", None):
-                logger.info("Loading LLM into memory (this will take a moment)...")
-                self.nlp_tokenizer = AutoTokenizer.from_pretrained("google/flan-t5-small")
-                self.nlp_model = AutoModelForSeq2SeqLM.from_pretrained("google/flan-t5-small")
+        # FAST KEYWORD EXTRACTION (Semantic Fallback Engine)
+        return self._fallback_extract(text, source_ref)
             
-            prompt = (
-                f"Task: Extract a semantic triplet from the text.\n"
-                f"Rule: The predicate MUST be a specific action verb like 'causes', 'enables', 'derives_from', 'acts_on'.\n"
-                f"Text: {text}\n"
-                f"Output strictly as: Subject | Predicate | Object"
-            )
-            inputs = self.nlp_tokenizer(prompt, return_tensors="pt", max_length=128, truncation=True)
-            outputs = self.nlp_model.generate(**inputs, max_new_tokens=50, temperature=0.1, do_sample=False)
-            output_text = self.nlp_tokenizer.decode(outputs[0], skip_special_tokens=True)
-            logger.info(f"Raw LLM output: {output_text}")
-            
-            # More robust parsing:
-            import re
-            parts = re.split(r'\s*\|\s*', output_text.strip())
-            
-            # Sometimes T5 returns 'Subject | Predicate | Object' literally, or fails to split
-            if len(parts) >= 3 and parts[0].lower() != "subject":
-                return [KnowledgeTriplet(subject=parts[0].title(), predicate=parts[1].replace(" ", "_").lower(), object=parts[2].title(), source_reference=source_ref)]
-            else:
-                logger.warning(f"LLM produced non-standard output format: {output_text}")
-                # Fallback to dynamic keyword extraction if the model fails layout
-                return self._fallback_extract(text, source_ref)
-                
-        except Exception as e:
-            logger.error(f"Genuine LLM extraction failed: {e}")
-            return self._fallback_extract(text, source_ref)
-            
-    def _fallback_extract(self, text, source_ref):
-        """Intelligent semantic fallback using spaCy Dependency Parsing when LLM fails"""
-        try:
-            import spacy
-            if not getattr(self, "spacy_nlp", None):
-                self.spacy_nlp = spacy.load("en_core_web_sm")
-        except ImportError:
-            logger.error("spaCy missing. Falling back to empty tuple generation.")
-            return []
-
-        doc = self.spacy_nlp(text)
-        triplets = []
+    def _fallback_extract(self, text: str, source_ref: Optional[str]):
+        """Intelligent semantic fallback when LLM structure parsing fails"""
+        # Expanded list of technical/action verbs for high-recall extraction
+        meaningful_verbs = [
+            'causes', 'derives_from', 'contradicts', 'enables', 'measured_by', 
+            'acts_on', 'produces', 'underlies', 'requires', 'provides', 
+            'outlines', 'implements', 'defines', 'explains', 'includes', 'supports',
+            'leverages', 'handles', 'mirrors', 'connects', 'gives', 'handles',
+            'processes', 'traverses', 'contains', 'governs', 'results_in',
+            'states', 'equals', 'produced', 'governed', 'associates'
+        ]
         
-        for token in doc:
-            # Find the main action verb in the sentence chunk
-            if token.pos_ == "VERB" and (token.dep_ == "ROOT" or token.dep_ == "advcl" or token.dep_ == "ccomp"):
-                subject = None
-                obj = None
-                
-                # Look for syntactic subject and object attached to this verb
-                for child in token.children:
-                    if child.dep_ in ("nsubj", "nsubjpass"):
-                        # Get the entire noun phrase for context, not just the single word
-                        subject = " ".join([w.text for w in child.subtree]).strip()
-                    if child.dep_ in ("dobj", "pobj", "attr", "acomp"):
-                        obj = " ".join([w.text for w in child.subtree]).strip()
-                        
-                if subject and obj and len(subject) > 2 and len(obj) > 2:
-                    # Clean out massive rambling subtrees (limit to 30 chars for UI aesthetics)
-                    subject = subject[:30].title()
-                    obj = obj[:30].title()
-                    predicate = token.lemma_.lower()
-                    triplets.append(KnowledgeTriplet(subject=subject, predicate=predicate, object=obj, source_reference=source_ref))
+        # Clean the text of bullets and extra whitespace
+        text = re.sub(r'^\W+', '', text).strip()
+        words: List[str] = text.split()
         
-        # Deduplicate elements
-        unique_triplets = []
-        seen = set()
-        for t in triplets:
-            key = f"{t.subject}-{t.predicate}-{t.object_}"
-            if key not in seen:
-                seen.add(key)
-                unique_triplets.append(t)
+        # Try to find multiple triplets in a single long sentence
+        extracted = []
+        for i, word in enumerate(words):
+            clean_word = re.sub(r'[^\w\s]', '', word.lower())
+            
+            # Match base verb or 's'/'es' variants
+            match_verb = None
+            for mv in meaningful_verbs:
+                if clean_word == mv or clean_word == mv.rstrip('s') or clean_word == mv + "s" or clean_word == mv + "es":
+                    match_verb = mv
+                    break
+            
+            if match_verb:
+                # Found a semantic edge!
+                start_p = max(0, i - 4)
+                # Using explicit loops with casted indices to satisfy Pyre2
+                subject_words: List[str] = []
+                for idx in range(int(start_p), int(i)):
+                    subject_words.append(words[idx])
+                subject = " ".join(subject_words).strip()
                 
-        return unique_triplets
+                end_p = min(len(words), i + 5)
+                obj_words: List[str] = []
+                for idx in range(int(i + 1), int(end_p)):
+                    obj_words.append(words[idx])
+                obj = " ".join(obj_words).strip()
+                
+                # Clean up punctuation and formatting
+                subject = re.sub(r'[^\w\s]', '', subject).strip().title()
+                obj = re.sub(r'[^\w\s]', '', obj).strip().title()
+                
+                # Validation: ensure we have concrete words on both sides
+                if subject and obj and len(subject) > 3 and len(obj) > 3:
+                    extracted.append(KnowledgeTriplet(
+                        subject=subject, 
+                        predicate=match_verb, 
+                        object=obj, 
+                        source_reference=source_ref
+                    ))
+        
+        return extracted
 

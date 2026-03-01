@@ -43,11 +43,14 @@ def ask_question(query, audio_file):
     except Exception as e:
         return f"Error: {e}. API backend might be offline."
 
+# Global store instance reused to avoid model reloading
+shared_store = LocalGraphStore(load_model=False)
+
 def render_graph():
-    store = LocalGraphStore()
+    shared_store.load() # Refresh from disk
     net = Network(height="500px", width="100%", directed=True, bgcolor="#18181A", font_color="white")
     
-    for u, v, data in store.graph.edges(data=True):
+    for u, v, data in shared_store.graph.edges(data=True):
         pred_label = data.get('predicate', 'related')
         net.add_node(u, title=u, color="#ED0000", size=25)  # AMD Red nodes
         net.add_node(v, title=v, color="#DCDCDC", size=20)
