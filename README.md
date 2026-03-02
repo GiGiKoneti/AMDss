@@ -1,5 +1,4 @@
-# 🧠 Linguist-Core: Sovereign Distributed Knowledge Graph
-
+# Linguist-Core:
 > **High-Fidelity Semantic Extraction & Edge-Resident GraphRAG for the AMD Slingshot Hackathon 2026.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-red.svg)](https://opensource.org/licenses/MIT)
@@ -8,117 +7,17 @@
 
 ---
 
-## 🔬 Scientific Abstract
+## Scientific Abstract
 
 **Linguist-Core** is a research-grade engine for decentralized knowledge management. Unlike traditional RAG systems that rely on centralized vector databases and cloud-hosted LLMs, Linguist-Core implements a **Sovereign Distributed Topology**. 
 
 It extracts semantic triples from unstructured documentation in real-time, builds a local heterogenous graph, and replicates that knowledge across an Infinity-Fabric-inspired P2P layer. By combining graph-traversal context with edge-quantized inference, it achieves **sub-100ms reasoning latency on local hardware**.
 
-**Key Philosophy**: No Cloud. No Compromise. 💎🔥
-
 ---
 
-## 🏗 System Architecture
+## Technical Setup
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    INGESTION & EXTRACTION                       │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│  Research Document → TS-Native Parser → Hybrid Extraction       │
-│                                         Engine → Semantic       │
-│                                                  Triples        │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
-                              ↓
-┌─────────────────────────────────────────────────────────────────┐
-│                      KNOWLEDGE FABRIC                           │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│  NetworkX MultiDiGraph ← Semantic Triples                       │
-│           ↓                                                     │
-│  BGE-M3 Embeddings (High-Fidelity Vector Encoding)              │
-│           ↓                                                     │
-│  ZMQ Sync Layer (Zero-Trust P2P Synchronization)                │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
-                              ↓
-┌─────────────────────────────────────────────────────────────────┐
-│                  DISTRIBUTED NETWORK                            │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│   Node A (Ryzen AI) ←ZMQ→ Node B (Radeon Pro) ←ZMQ→             │
-│                                                                 │
-│                     Node C (Instinct MI)                        │
-│                                                                 │
-│   All nodes maintain synchronized global state                  │
-│   Raw source files never shared across network                  │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
-                              ↓
-┌─────────────────────────────────────────────────────────────────┐
-│                      INFERENCE PATH                             │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│  User Query → GraphRAG BFS Traversal                            │
-│                     ↓                                           │
-│          Neighborhood Context Extraction                        │
-│                     ↓                                           │
-│       Quantized flan-t5 (AMD ROCm Optimized)                    │
-│                     ↓                                           │
-│           Sovereign, Local Answer Generation                    │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
-```
-
----
-
-## 🚀 Key Innovations
-
-### 1. Infinity-Fabric Inspired P2P Sync
-We implement a **zero-trust synchronization layer** using **ZeroMQ (ZMQ)**. When a document is ingested on Node A, the semantic triples are broadcast to the entire ring topology. Every node maintains a synchronized global state without ever sharing the raw source files, ensuring **data privacy and sovereignty** at scale.
-
-**Benefits:**
-- No central point of failure
-- Cryptographically secure peer verification
-- Real-time consistency across distributed nodes
-- Bandwidth-efficient triple replication
-
-### 2. Edge-Quantized GraphRAG
-Our retrieval logic utilizes a **Semantic Breadth-First Search (BFS)** traversal. Instead of simple vector similarity search, we follow relational edges (e.g., `Newton > enables > Propulsion`) to build a chain of reasoning. This rich contextual neighborhood is injected into a **4-bit quantized `flan-t5` model**, optimized for **AMD ROCm** and **Ryzen AI NPUs**.
-
-**Performance Advantages:**
-- Sub-100ms response latency
-- Maintains reasoning transparency through edge tracing
-- Local execution eliminates cloud dependencies
-- Quantization reduces memory footprint by 75%
-
-### 3. High-Fidelity Sovereign Dashboard UI
-A premium, dark-mode interface tailored for technical reviewers and researchers:
-
-**Tab 1: Ingest & Sync**
-- Real-time peer monitoring and health telemetry
-- RCCL-inspired ring topology visualization
-- Document ingestion progress tracking
-- Graph synchronization status dashboard
-
-**Tab 2: GraphRAG Query**
-- Relational path visualization with confidence scores
-- Multi-hop reasoning explanations
-- Edge traversal tracing and validation
-- Query execution telemetry and latency monitoring
-
-**Tab 3: Graph Visualizer**
-- Interactive Vis.js graph of the distributed knowledge base
-- Node filtering and relationship exploration
-- Semantic relationship strength indicators
-- Real-time graph updates across all connected peers
-
----
-
-## 💻 Technical Setup
-
-### Prerequisites
+## Prerequisites
 
 **Software Requirements:**
 - Python 3.10+ (Recommended 3.11 or 3.12)
@@ -136,15 +35,15 @@ A premium, dark-mode interface tailored for technical reviewers and researchers:
 - HIP development tools
 - RCCL (ROCm Collective Communications Library)
 
-### Installation & Environment
+## Installation & Environment
 
-#### Step 1: Clone Repository
+##  Step 1: Clone Repository
 ```bash
 git clone https://github.com/GiGiKoneti/AMDss.git
 cd AMDss
 ```
 
-#### Step 2: Create Virtual Environment
+##  Step 2: Create Virtual Environment
 ```bash
 # Create isolated Python environment
 python3 -m venv cleanenv --upgrade-deps
@@ -160,7 +59,7 @@ source cleanenv/bin/activate
 .\cleanenv\Scripts\activate.bat
 ```
 
-#### Step 3: Verify Environment
+##  Step 3: Verify Environment
 ```bash
 # Should point to .../AMDss/cleanenv/bin/python
 which python
@@ -169,7 +68,7 @@ which python
 pip --version
 ```
 
-#### Step 4: Install Dependencies
+##  Step 4: Install Dependencies
 ```bash
 pip install -r requirements.txt
 ```
@@ -184,9 +83,9 @@ pip install -r requirements.txt
 
 ---
 
-## 🚀 Execution Modes
+## Execution Modes
 
-### Single-Node Mode (Local Development)
+##  Single-Node Mode (Local Development)
 ```bash
 export PYTHONPATH=$PYTHONPATH:.
 
@@ -199,7 +98,7 @@ python3 -m linguist_core.ui_app
 
 Then navigate to `http://localhost:8501` in your browser.
 
-### Distributed Mode (Multi-Node Cluster)
+## Distributed Mode (Multi-Node Cluster)
 
 **Network Setup Example:**
 - Node A: `192.168.0.107` (Primary)
@@ -244,7 +143,7 @@ All three dashboards should display synchronized peer status. Document ingestion
 
 ---
 
-## 📊 Performance Benchmarks
+##   Performance Benchmarks
 
 **Hardware:** AMD Ryzen AI 9 HX 370 with Radeon 780M GPU
 
@@ -265,7 +164,7 @@ All three dashboards should display synchronized peer status. Document ingestion
 
 ---
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 AMDss/
@@ -301,9 +200,9 @@ AMDss/
 
 ---
 
-## 🔧 Configuration
+##  Configuration
 
-### Main Configuration (config.yaml)
+## Main Configuration (config.yaml)
 
 ```yaml
 # Core Settings
@@ -358,7 +257,7 @@ ui:
   enable_telemetry: true
 ```
 
-### Environment Variables
+## # Environment Variables
 
 ```bash
 # Core Configuration
@@ -382,9 +281,9 @@ export SENTENCE_TRANSFORMERS_HOME=./embeddings_cache
 
 ---
 
-## 🔄 Workflow Example
+## Workflow Example
 
-### 1. Ingest a Research Document
+## # 1. Ingest a Research Document
 
 ```python
 from linguist_core.extractor import SemanticExtractor
@@ -405,7 +304,7 @@ print(f"Extracted {len(triples)} semantic triples")
 # Output: Extracted 1247 semantic triples
 ```
 
-### 2. Synchronize Across Network
+## # 2. Synchronize Across Network
 
 ```python
 from linguist_core.sync_layer import P2PSync
@@ -422,7 +321,7 @@ print(f"Connected peers: {status['connected_count']}")
 # Output: Connected peers: 2
 ```
 
-### 3. Query with GraphRAG
+## # 3. Query with GraphRAG
 
 ```python
 from linguist_core.inference import GraphRAG
@@ -441,29 +340,29 @@ print(f"Confidence: {result['confidence']:.2%}")
 
 ---
 
-## 🧪 Testing & Validation
+## Testing & Validation
 
-### Run Unit Tests
+## # Run Unit Tests
 ```bash
 pytest tests/ -v --cov=linguist_core
 ```
 
-### Test Extraction Pipeline
+## # Test Extraction Pipeline
 ```bash
 python3 -m pytest tests/test_extraction.py -v
 ```
 
-### Test Graph Operations
+## # Test Graph Operations
 ```bash
 python3 -m pytest tests/test_graph.py -v
 ```
 
-### Test P2P Synchronization
+## # Test P2P Synchronization
 ```bash
 python3 -m pytest tests/test_sync.py -v
 ```
 
-### Integration Test (Multi-Node)
+## # Integration Test (Multi-Node)
 ```bash
 # Terminal 1 (Node A)
 python3 tests/integration_test.py --node-id=a --peer-count=2
@@ -474,7 +373,7 @@ python3 tests/integration_test.py --node-id=b --peer-count=2
 
 ---
 
-## 📚 Key Technologies
+## Key Technologies
 
 | Component | Technology | Purpose |
 |:---|:---|:---|
@@ -490,7 +389,7 @@ python3 tests/integration_test.py --node-id=b --peer-count=2
 
 ---
 
-## 🔐 Security & Privacy
+##  Security & Privacy
 
 **Sovereignty Guarantees:**
 - ✅ Zero data sharing of source documents across peers
@@ -508,15 +407,15 @@ python3 tests/integration_test.py --node-id=b --peer-count=2
 
 ---
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
-### Issue: `ModuleNotFoundError: No module named 'linguist_core'`
+ Issue: `ModuleNotFoundError: No module named 'linguist_core'`
 **Solution:** Ensure PYTHONPATH is set correctly:
 ```bash
 export PYTHONPATH=$PYTHONPATH:.
 ```
 
-### Issue: ZMQ Connection Timeout
+## Issue: ZMQ Connection Timeout
 **Solution:** Check firewall rules and peer IP addresses:
 ```bash
 # Verify connectivity
@@ -526,14 +425,14 @@ ping 192.168.0.112
 netstat -an | grep 5555
 ```
 
-### Issue: ROCm GPU Not Detected
+## Issue: ROCm GPU Not Detected
 **Solution:** Verify ROCm installation:
 ```bash
 rocm-smi
 hipcc --version
 ```
 
-### Issue: Slow Extraction Performance
+##  Issue: Slow Extraction Performance
 **Solution:** Enable NPU acceleration and batch processing:
 ```bash
 export HIP_DEVICE_ORDER=PCI
@@ -542,7 +441,7 @@ export HIP_DEVICE_ORDER=PCI
 
 ---
 
-## 📖 Documentation & Resources
+## Documentation & Resources
 
 **Comprehensive Guides:**
 - [Architecture Deep Dive](./docs/architecture.md)
@@ -558,7 +457,7 @@ export HIP_DEVICE_ORDER=PCI
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions to advance sovereign AI. Please follow these guidelines:
 
@@ -576,7 +475,7 @@ pre-commit install
 
 ---
 
-## 📜 License & Attribution
+##  📜 License & Attribution
 
 **License:** MIT License
 
@@ -588,7 +487,7 @@ This project represents a vision for **sovereign, decentralized AI**. No Cloud. 
 
 ---
 
-## 🏆 Project Highlights
+## Project Highlights
 
 - **Research-Grade Architecture**: Scientifically rigorous approach to distributed knowledge management
 - **Performance-First Design**: Sub-100ms latency through edge-quantized inference
@@ -599,7 +498,7 @@ This project represents a vision for **sovereign, decentralized AI**. No Cloud. 
 
 ---
 
-## 📞 Support & Community
+## Support & Community
 
 - **Issues & Feature Requests**: [GitHub Issues](https://github.com/GiGiKoneti/AMDss/issues)
 - **Discussions & Q&A**: [GitHub Discussions](https://github.com/GiGiKoneti/AMDss/discussions)
@@ -607,7 +506,7 @@ This project represents a vision for **sovereign, decentralized AI**. No Cloud. 
 
 ---
 
-## ⚡ Quick Reference
+##  Quick Reference
 
 **Start Development:**
 ```bash
@@ -638,4 +537,4 @@ For the latest updates, visit the [GitHub repository](https://github.com/GiGiKon
 
 ---
 
-> **"The future of AI belongs to those who own their intelligence. Linguist-Core: Sovereign Knowledge for Sovereign Minds."** 🧠💎
+> **"The future of AI belongs to those who own their intelligence. Linguist-Core: Sovereign Knowledge for Sovereign Minds."**
