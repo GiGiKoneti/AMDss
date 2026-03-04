@@ -14,6 +14,14 @@
 It extracts semantic triples from unstructured documentation in real-time, builds a local heterogenous graph, and replicates that knowledge across an Infinity-Fabric-inspired P2P layer. By combining graph-traversal context with edge-quantized inference, it achieves **sub-100ms reasoning latency on local hardware**.
 
 ---
+## Screenshots
+<img width="1280" height="960" alt="image" src="https://github.com/user-attachments/assets/0957058f-f98d-4bf6-99ec-5a4f7a440393" />
+<img width="1280" height="733" alt="image" src="https://github.com/user-attachments/assets/55cc315c-36c9-4e84-8467-4290ed91e088" />
+<img width="1280" height="734" alt="image" src="https://github.com/user-attachments/assets/a83af402-b7a9-40ca-b47c-2c0c162075a7" />
+<img width="1280" height="730" alt="image" src="https://github.com/user-attachments/assets/d0bdaa7c-30d2-4e93-9bb5-3857616449bc" />
+
+
+---
 
 ## Technical Setup
 
